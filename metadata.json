@@ -1,0 +1,6 @@
+{
+  "name": "My HealthMate",
+  "description": "My HealthMate - An all-in-one health, hydration, medicine and sleep reminder companion for daily wellness, steps, and habits.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

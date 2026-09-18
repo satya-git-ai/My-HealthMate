@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Center safe group bounded strictly within 66dp circle -->
+    <group
+        android:translateX="54"
+        android:translateY="54">
+
+        <!-- Outer Dynamic Glow Track Ring -->
+        <path
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:pathData="M -24,4 C -28,-14 -12,-26 8,-24 C 24,-22 28,-8 22,10 C 18,22 4,28 -10,26">
+            <aapt:attr name="android:strokeColor">
+                <gradient
+                    android:startX="-24"
+                    android:startY="-26"
+                    android:endX="28"
+                    android:endY="28"
+                    android:type="linear">
+                    <item android:color="#00F5D4" android:offset="0.0" />
+                    <item android:color="#00BBF9" android:offset="0.5" />
+                    <item android:color="#4361EE" android:offset="1.0" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Dynamic Runner Sprint Silhouette (Crisp, stylized forward leap) -->
+        <!-- Runner Head -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 7,-16 A 4,4 0 1,0 7,-24 A 4,4 0 1,0 7,-16 Z" />
+
+        <!-- Runner Torso & Wing Streamline -->
+        <path
+            android:pathData="M -4,-8 L 5,-14 C 7,-15 10,-13 11,-10 L 10,-1 C 9,3 5,5 2,5 L -4,-3 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="-4"
+                    android:startY="-14"
+                    android:endX="11"
+                    android:endY="5"
+                    android:type="linear">
+                    <item android:color="#FFFFFF" android:offset="0.0" />
+                    <item android:color="#00F5D4" android:offset="1.0" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Forward Stride Arm -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="3.2"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M 6,-10 L 14,-6 L 18,-11" />
+
+        <!-- Trailing Arm -->
+        <path
+            android:strokeColor="#00BBF9"
+            android:strokeWidth="2.8"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M 0,-7 L -7,-4 L -11,-9" />
+
+        <!-- Forward Sprint Leg -->
+        <path
+            android:strokeColor="#00F5D4"
+            android:strokeWidth="3.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M 3,6 L 8,13 L 4,21" />
+        <!-- Running Shoe (Emerald glow) -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 1,20 L 7,21 L 5,23 L 1,22 Z" />
+
+        <!-- Back Power Push Leg -->
+        <path
+            android:strokeColor="#00BBF9"
+            android:strokeWidth="3.2"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M -3,5 L -10,10 L -19,8" />
+        <!-- Rear Shoe (Coral highlight) -->
+        <path
+            android:fillColor="#FF5252"
+            android:pathData="M -19,7 L -23,9 L -22,11 L -18,10 Z" />
+
+        <!-- Glowing Vitality Heart Pulse Line Overlay (Left) -->
+        <path
+            android:strokeColor="#FF5252"
+            android:strokeWidth="2.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M -26,-2 L -20,-2 L -17,-9 L -13,4 L -10,-2 L -6,-2" />
+
+        <!-- Small Sparkle Vitality Stars -->
+        <path
+            android:fillColor="#FFD166"
+            android:pathData="M 19,-18 L 20,-15 L 23,-14 L 20,-13 L 19,-10 L 18,-13 L 15,-14 L 18,-15 Z" />
+        <path
+            android:fillColor="#00F5D4"
+            android:pathData="M -18,18 L -17,20 L -15,21 L -17,22 L -18,24 L -19,22 L -21,21 L -19,20 Z" />
+
+    </group>
+</vector>
