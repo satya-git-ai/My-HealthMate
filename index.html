@@ -22,6 +22,7 @@
                         brand: {
                             50: '#ecfdf5',
                             100: '#d1fae5',
+                            400: '#34d399',
                             500: '#10b981',
                             600: '#059669',
                             700: '#047857',
@@ -46,16 +47,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
         }
-
-        /* Float animation for the hero image placeholder */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-500 selection:text-white overflow-x-hidden">
@@ -77,12 +68,12 @@
                 </h1>
                 
                 <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-                    Track your steps, build lasting habits, and let smart AI keep your health on schedule. The ultimate companion for a better you.
+                    Track your steps, build lasting habits, and let smart reminders keep your health on schedule. The ultimate companion for a better you.
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <!-- CRITICAL: Functional Download Button for GitHub Pages -->
-                    <a href="./MyHealthMate.apk" download="MyHealthMate.apk" class="w-full sm:w-auto px-8 py-4 rounded-full bg-brand-500 text-white font-semibold text-lg hover:bg-brand-400 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center gap-3">
+                    <!-- CRITICAL: Functional Download Button mapped exactly to "My HealthMate.apk" -->
+                    <a href="My%20HealthMate.apk" download="My HealthMate.apk" class="w-full sm:w-auto px-8 py-4 rounded-full bg-brand-500 text-white font-semibold text-lg hover:bg-brand-400 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center gap-3">
                         <i class="fas fa-download"></i>
                         Download APK
                     </a>
@@ -103,21 +94,22 @@
     </header>
 
     <section id="features" class="py-24 relative z-10 bg-slate-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-brand-600 font-bold tracking-wider uppercase text-sm mb-3">Core Capabilities</h2>
                 <h3 class="text-3xl md:text-4xl font-bold text-slate-900">App Features</h3>
                 <div class="w-24 h-1 bg-brand-500 mx-auto mt-6 rounded-full"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Changed to 2 columns to perfectly balance the 2 core features -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Feature 1 -->
                 <div class="glass-card rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 group">
                     <div class="w-16 h-16 rounded-2xl bg-brand-100 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-brand-500 transition-all duration-300">
                         <i class="fas fa-shoe-prints text-2xl text-brand-600 group-hover:text-white transition-colors duration-300"></i>
                     </div>
-                    <h4 class="text-xl font-bold text-slate-900 mb-3">Activity & Habits</h4>
-                    <p class="text-slate-600 leading-relaxed">
+                    <h4 class="text-2xl font-bold text-slate-900 mb-4">Activity & Habits</h4>
+                    <p class="text-slate-600 leading-relaxed text-lg">
                         Designed to accurately track your daily steps and monitor habits to support your overall wellness goals. Stay active and build a better routine effortlessly.
                     </p>
                 </div>
@@ -127,20 +119,9 @@
                     <div class="w-16 h-16 rounded-2xl bg-brand-100 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-brand-500 transition-all duration-300">
                         <i class="fas fa-bell text-2xl text-brand-600 group-hover:text-white transition-colors duration-300"></i>
                     </div>
-                    <h4 class="text-xl font-bold text-slate-900 mb-3">Smart Reminders</h4>
-                    <p class="text-slate-600 leading-relaxed">
+                    <h4 class="text-2xl font-bold text-slate-900 mb-4">Smart Reminders</h4>
+                    <p class="text-slate-600 leading-relaxed text-lg">
                         Includes built-in, timely scheduling capabilities with specific, customizable reminders for hydration, medicine intake, and optimizing your sleep cycle.
-                    </p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="glass-card rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 group">
-                    <div class="w-16 h-16 rounded-2xl bg-brand-100 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-brand-500 transition-all duration-300">
-                        <i class="fas fa-brain text-2xl text-brand-600 group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <h4 class="text-xl font-bold text-slate-900 mb-3">AI Capabilities</h4>
-                    <p class="text-slate-600 leading-relaxed">
-                        Integrates server-side Gemini API features for smart insights, securely injecting the required API key at runtime via a robust secrets manager.
                     </p>
                 </div>
             </div>
@@ -194,19 +175,19 @@
                     <ul class="space-y-3 text-slate-400 mt-4">
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-brand-500 mt-1"></i>
-                            <span>Uses Kotlin Symbol Processing (KSP) for faster code generation.</span>
+                            <span>Uses <strong>Kotlin Symbol Processing (KSP)</strong> for faster code generation.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-brand-500 mt-1"></i>
-                            <span>Integrates Roborazzi for automated visual snapshot testing.</span>
+                            <span>Integrates <strong>Roborazzi</strong> for automated visual snapshot testing.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-brand-500 mt-1"></i>
-                            <span>Incorporates Google Services, configured to allow successful builds even if the <code>google-services.json</code> file is temporarily missing.</span>
+                            <span>Incorporates <strong>Google Services</strong>, configured to allow successful builds even if the <code>google-services.json</code> file is temporarily missing.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-brand-500 mt-1"></i>
-                            <span>Utilizes the Foojay toolchain resolver convention for JVM management.</span>
+                            <span>Utilizes the <strong>Foojay</strong> toolchain resolver convention for JVM management.</span>
                         </li>
                     </ul>
                 </div>
