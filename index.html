@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My HealthMate | Daily Wellness Companion</title>
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-light: #10b981;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --text-gray: #4b5563;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--dark) 0%, #111827 100%);
+            color: var(--white);
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary-light), #6ee7b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 1.25rem;
+            color: #d1d5db;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .cta-button:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--dark);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .tech-stack {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        .tech-category h4 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .tech-list {
+            list-style: none;
+        }
+
+        .tech-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        .tech-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        footer {
+            background: var(--dark);
+            color: var(--white);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-text {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>My HealthMate</h1>
+            <p class="tagline">An all-in-one daily wellness companion designed to track steps, build habits, and keep your health on schedule.</p>
+            <a href="#download" class="cta-button">Download for Android</a>
+        </div>
+    </header>
+
+    <section id="features">
+        <h2 class="section-title">Smart Features for Daily Wellness</h2>
+        <div class="features-grid">
+            <div class="card">
+                <div class="card-icon">👣</div>
+                <h3>Activity & Habits</h3>
+                <p>Seamlessly track your daily steps and build consistent wellness habits to maintain a healthy and active lifestyle.</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">⏰</div>
+                <h3>Smart Reminders</h3>
+                <p>Never miss a beat with built-in, timely notifications for hydration, medicine intake, and sleep schedules.</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">🧠</div>
+                <h3>AI-Powered Insights</h3>
+                <p>Leverages server-side Gemini API features for advanced intelligence, utilizing a secure secrets manager for safe runtime key injection.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="tech-stack">
+        <h2 class="section-title">Built for Performance</h2>
+        <div class="tech-stack">
+            <div class="tech-grid">
+                <div class="tech-category">
+                    <h4>Platform & UI</h4>
+                    <ul class="tech-list">
+                        <li>Native Android architecture</li>
+                        <li>100% Kotlin codebase</li>
+                        <li>Modern UI built exclusively with Jetpack Compose</li>
+                    </ul>
+                </div>
+
+                <div class="tech-category">
+                    <h4>Plugins & Tooling</h4>
+                    <ul class="tech-list">
+                        <li>Kotlin Symbol Processing (KSP) for efficient code generation</li>
+                        <li>Roborazzi integrated for accurate visual snapshot testing</li>
+                        <li>Foojay toolchain resolver convention for seamless JVM management</li>
+                        <li>Resilient Google Services configuration (builds succeed without local JSON)</li>
+                    </ul>
+                </div>
+
+                <div class="tech-category" style="grid-column: 1 / -1;">
+                    <h4>Build & Resource Optimization</h4>
+                    <ul class="tech-list">
+                        <li>High-performance Gradle environment: 4GB JVM heap (-Xmx4g), in-process Kotlin compilation, parallel execution, and configuration caching</li>
+                        <li>Maximized machine stability with builds explicitly capped at 4 workers</li>
+                        <li>Minimized APK size utilizing non-transitive R classes to reduce compiled resources</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff;">My HealthMate</h2>
+            <p class="footer-text">Built with Kotlin & Jetpack Compose</p>
+            <p class="footer-text" style="margin-top: 1rem;">&copy; 2026. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
