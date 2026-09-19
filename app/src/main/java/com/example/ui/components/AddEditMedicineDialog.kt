@@ -345,21 +345,25 @@ fun AddEditMedicineDialog(
                                     Column {
                                         Text(
                                             text = "▲",
-                                            fontSize = 12.sp,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = HealthBlue,
                                             modifier = Modifier
                                                 .clickable {
                                                     displayHour12 = if (displayHour12 >= 12) 1 else displayHour12 + 1
                                                 }
-                                                .padding(2.dp)
+                                                .padding(horizontal = 4.dp, vertical = 2.dp)
                                         )
                                         Text(
                                             text = "▼",
-                                            fontSize = 12.sp,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = HealthBlue,
                                             modifier = Modifier
                                                 .clickable {
                                                     displayHour12 = if (displayHour12 <= 1) 12 else displayHour12 - 1
                                                 }
-                                                .padding(2.dp)
+                                                .padding(horizontal = 4.dp, vertical = 2.dp)
                                         )
                                     }
                                 }
@@ -372,9 +376,9 @@ fun AddEditMedicineDialog(
                                 modifier = Modifier.padding(horizontal = 10.dp)
                             )
 
-                            // Minute selector
+                            // Minute selector with direct custom input and single-minute steppers
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Minute", style = MaterialTheme.typography.labelSmall)
+                                Text("Minute (0-59)", style = MaterialTheme.typography.labelSmall)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -393,21 +397,25 @@ fun AddEditMedicineDialog(
                                     Column {
                                         Text(
                                             text = "▲",
-                                            fontSize = 12.sp,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = HealthBlue,
                                             modifier = Modifier
                                                 .clickable {
-                                                    reminderMinute = (reminderMinute + 5) % 60
+                                                    reminderMinute = (reminderMinute + 1) % 60
                                                 }
-                                                .padding(2.dp)
+                                                .padding(horizontal = 4.dp, vertical = 2.dp)
                                         )
                                         Text(
                                             text = "▼",
-                                            fontSize = 12.sp,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = HealthBlue,
                                             modifier = Modifier
                                                 .clickable {
-                                                    reminderMinute = if (reminderMinute - 5 < 0) 55 else reminderMinute - 5
+                                                    reminderMinute = if (reminderMinute - 1 < 0) 59 else reminderMinute - 1
                                                 }
-                                                .padding(2.dp)
+                                                .padding(horizontal = 4.dp, vertical = 2.dp)
                                         )
                                     }
                                 }
@@ -455,11 +463,11 @@ fun AddEditMedicineDialog(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
                         // Quick Time Presets
                         Text(
-                            text = "Quick presets:",
+                            text = "Quick hour presets:",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

@@ -17,7 +17,6 @@ import androidx.navigation.navArgument
 import com.example.ui.components.HealthBottomNavigation
 import com.example.ui.screens.DayDetailScreen
 import com.example.ui.screens.GoalsScreen
-import com.example.ui.screens.GpsLocationPermissionScreen
 import com.example.ui.screens.GpsTrackerScreen
 import com.example.ui.screens.HistoryScreen
 import com.example.ui.screens.HomeScreen
@@ -170,18 +169,6 @@ fun HealthFitApp(
                 )
             }
 
-            // 3. Dedicated GPS & Location Permission Asking Screen (Transparent Glossy)
-            composable("gps_permission") {
-                GpsLocationPermissionScreen(
-                    onPermissionGranted = {
-                        navController.popBackStack()
-                    },
-                    onBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-
             // 4. Home Dashboard Screen
             composable("home") {
                 HomeScreen(
@@ -199,7 +186,7 @@ fun HealthFitApp(
                 )
             }
 
-            // 6. GPS Walking / Running Tracker Screen
+            // 6. Walking / Running Tracker Screen
             composable("gps_tracker") {
                 GpsTrackerScreen(
                     viewModel = viewModel,
@@ -207,10 +194,7 @@ fun HealthFitApp(
                     onViewRouteDetail = { workoutId ->
                         navController.navigate("route_detail/$workoutId")
                     },
-                    onHome = { navigateHome() },
-                    onOpenGpsPermissionScreen = {
-                        navController.navigate("gps_permission")
-                    }
+                    onHome = { navigateHome() }
                 )
             }
 
@@ -293,9 +277,9 @@ fun HealthFitApp(
                     viewModel = viewModel,
                     onBack = { navigateBack() },
                     onNavigateGoals = { navController.navigate("goals") },
-                    onNavigatePermissions = { navController.navigate("gps_permission") },
+                    onNavigatePermissions = { },
                     onNavigateCalculator = { navController.navigate("weight_loss_calculator") },
-                    onNavigateProfile = { navController.navigate("onboarding") },
+                    onNavigateProfile = { navController.navigate("personalize_plan") },
                     onHome = { navigateHome() }
                 )
             }

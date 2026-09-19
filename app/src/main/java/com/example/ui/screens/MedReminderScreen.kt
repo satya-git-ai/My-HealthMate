@@ -400,7 +400,12 @@ fun MedReminderScreen(
                                     scheduledTime = timeStr,
                                     action = "Taken"
                                 )
-                                Toast.makeText(context, "${medicine.name} marked as taken!", Toast.LENGTH_SHORT).show()
+                                val msg = if (medicine.repeatType.equals("Once", ignoreCase = true)) {
+                                    "${medicine.name} marked as taken and completed (disabled)!"
+                                } else {
+                                    "${medicine.name} marked as taken!"
+                                }
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                             },
                             onTestReminder = {
                                 activeReminderMedicine = medicine
@@ -593,22 +598,6 @@ fun MedicineCardItem(
                                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            if (isTakenToday) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(HealthEmerald.copy(alpha = 0.15f))
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                ) {
-                                    Text(
-                                        text = "TAKEN TODAY",
-                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                        color = HealthEmerald,
-                                        fontSize = 9.sp
-                                    )
-                                }
-                            }
                         }
                         Text(
                             text = "${medicine.type}${if (medicine.dosage.isNotBlank()) " • ${medicine.dosage}" else ""}",
@@ -628,32 +617,34 @@ fun MedicineCardItem(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Timing & Schedule Badges
+            // Timing & Schedule Badges (Hide time badge if inactive)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Time badge
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(HealthBlue.copy(alpha = 0.12f))
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
-                            tint = HealthBlue,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = reminderTimeString,
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                            color = HealthBlue
-                        )
+                // Time badge: only shown if medicine is active
+                if (medicine.isActive) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(HealthBlue.copy(alpha = 0.12f))
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = null,
+                                tint = HealthBlue,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = reminderTimeString,
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                                color = HealthBlue
+                            )
+                        }
                     }
                 }
 
@@ -694,12 +685,17 @@ fun MedicineCardItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Quick "Mark Taken" button
+                // "Taken" button (Active green when active & pending, disabled/greyed out if inactive or already taken today)
+                val isButtonDisabled = !medicine.isActive || isTakenToday
                 Button(
                     onClick = onTakeNow,
+                    enabled = !isButtonDisabled,
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isTakenToday) HealthEmerald.copy(alpha = 0.2f) else HealthEmerald
+                        containerColor = HealthEmerald,
+                        contentColor = Color.White,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                        disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                     ),
                     modifier = Modifier
                         .height(42.dp)
@@ -708,29 +704,31 @@ fun MedicineCardItem(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        tint = if (isTakenToday) HealthEmerald else Color.White,
+                        tint = if (isButtonDisabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f) else Color.White,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (isTakenToday) "Taken" else "Take Now",
+                        text = "Taken",
                         fontWeight = FontWeight.Bold,
-                        color = if (isTakenToday) HealthEmerald else Color.White,
+                        color = if (isButtonDisabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f) else Color.White,
                         fontSize = 13.sp
                     )
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Test reminder trigger
-                    IconButton(
-                        onClick = onTestReminder,
-                        modifier = Modifier.testTag("btn_test_reminder_${medicine.id}")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.NotificationsActive,
-                            contentDescription = "Test Reminder",
-                            tint = HealthBlue
-                        )
+                    // Test reminder trigger (Alarm bell): only shown if medicine is active
+                    if (medicine.isActive) {
+                        IconButton(
+                            onClick = onTestReminder,
+                            modifier = Modifier.testTag("btn_test_reminder_${medicine.id}")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.NotificationsActive,
+                                contentDescription = "Test Reminder",
+                                tint = HealthBlue
+                            )
+                        }
                     }
 
                     // Edit button

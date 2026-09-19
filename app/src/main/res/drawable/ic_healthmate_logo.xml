@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="108dp"
-    android:height="108dp"
+    android:width="128dp"
+    android:height="128dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Center safe group bounded strictly within 66dp circle -->
     <group
         android:translateX="54"
         android:translateY="54">
 
-        <!-- Glowing Neon Cyan Pulse Backdrop Glow -->
+        <!-- Outer Glowing Pulse Arc Halo -->
         <path
-            android:strokeColor="#4000E5FF"
-            android:strokeWidth="9"
+            android:strokeColor="#3000E5FF"
+            android:strokeWidth="10"
             android:strokeLineCap="round"
             android:strokeLineJoin="round"
             android:pathData="M -26,2 L -12,2 L -6,-14 L 3,14 L 10,-4 L 14,2 L 26,2" />
@@ -38,14 +37,14 @@
             </aapt:attr>
         </path>
 
-        <!-- Top Right Accent Ring / Spark -->
+        <!-- Top Right Accent Ring Dot -->
         <path
             android:fillColor="#10B981"
             android:strokeColor="#FFFFFF"
             android:strokeWidth="1.8"
             android:pathData="M 14.5,-12.5 m -3.5,0 a 3.5,3.5 0 1,0 7,0 a 3.5,3.5 0 1,0 -7,0" />
 
-        <!-- Crisp Neon Cyan Vitality Pulse Line -->
+        <!-- Neon Cyan Vitality Pulse Wave Line -->
         <path
             android:strokeColor="#00E5FF"
             android:strokeWidth="4.5"
@@ -54,12 +53,12 @@
             android:pathData="M -26,2 L -12,2 L -6,-14 L 3,14 L 10,-4 L 14,2 L 26,2" />
 
         <!-- 5 Stride / Vitality Curved Arc Dots -->
-        <!-- Dot 1 (Left) -->
+        <!-- Dot 1 (Far Left) -->
         <path
             android:fillColor="#34D399"
             android:pathData="M -16,13 m -2.2,0 a 2.2,2.2 0 1,0 4.4,0 a 2.2,2.2 0 1,0 -4.4,0" />
 
-        <!-- Dot 2 (Mid-Left) -->
+        <!-- Dot 2 (Mid Left) -->
         <path
             android:fillColor="#00E5FF"
             android:pathData="M -8,18 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
@@ -69,12 +68,12 @@
             android:fillColor="#10B981"
             android:pathData="M 0,21 m -2.8,0 a 2.8,2.8 0 1,0 5.6,0 a 2.8,2.8 0 1,0 -5.6,0" />
 
-        <!-- Dot 4 (Mid-Right) -->
+        <!-- Dot 4 (Mid Right) -->
         <path
             android:fillColor="#059669"
             android:pathData="M 8,18 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
 
-        <!-- Dot 5 (Right) -->
+        <!-- Dot 5 (Far Right) -->
         <path
             android:fillColor="#047857"
             android:pathData="M 16,13 m -2.2,0 a 2.2,2.2 0 1,0 4.4,0 a 2.2,2.2 0 1,0 -4.4,0" />

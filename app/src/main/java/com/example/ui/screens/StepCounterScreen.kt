@@ -90,6 +90,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.sensor.SensorTypeUsed
+import com.example.ui.components.StreakCelebrationOverlay
 import com.example.ui.theme.HealthBlue
 import com.example.ui.theme.HealthCyan
 import com.example.ui.theme.HealthEmerald
@@ -177,6 +178,14 @@ fun StepCounterScreen(
     val caloriesBurned = (totalSteps * 0.04f).toInt()
     val activeMinutes = maxOf(1, totalSteps / 100)
     val isStreakAchieved = totalSteps >= stepGoal && stepGoal > 0
+    var showStreakCelebration by remember { mutableStateOf(false) }
+
+    // Trigger celebration when streak is newly achieved
+    androidx.compose.runtime.LaunchedEffect(isStreakAchieved) {
+        if (isStreakAchieved && totalSteps > 0) {
+            showStreakCelebration = true
+        }
+    }
 
     // Clean, crisp Light Theme Palette by default
     val backgroundColor = MaterialTheme.colorScheme.background
@@ -468,11 +477,13 @@ fun StepCounterScreen(
                                     color = textPrimary
                                 )
                             }
-                            Text(
-                                text = "%,d to streak 🔥".format(remainingSteps),
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-                                color = StepsFireOrange
-                            )
+                            if (totalSteps > 0 && remainingSteps > 0) {
+                                Text(
+                                    text = "%,d to streak 🔥".format(remainingSteps),
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                                    color = StepsFireOrange
+                                )
+                            }
                         }
                     }
                 }
@@ -866,23 +877,45 @@ fun StepCounterScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Milestone test button to instantly test streak
+                val isAchieveDisabled = isStreakAchieved || totalSteps >= stepGoal
                 Button(
                     onClick = {
-                        val toAdd = maxOf(1000, stepGoal - totalSteps)
-                        viewModel.addManualStepCount(toAdd)
-                        Toast.makeText(context, "Streak achieved 🔥", Toast.LENGTH_SHORT).show()
+                        if (!isAchieveDisabled) {
+                            val toAdd = maxOf(1, stepGoal - totalSteps)
+                            viewModel.addManualStepCount(toAdd)
+                            Toast.makeText(context, "Streak achieved 🔥", Toast.LENGTH_SHORT).show()
+                        }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = StepsFireOrange.copy(alpha = 0.15f)),
+                    enabled = !isAchieveDisabled,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = StepsFireOrange.copy(alpha = 0.15f),
+                        contentColor = StepsFireOrange,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                        disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    ),
                     shape = RoundedCornerShape(10.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, StepsFireOrange.copy(alpha = 0.4f)),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (isAchieveDisabled) MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                        else StepsFireOrange.copy(alpha = 0.4f)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(38.dp)
+                        .testTag("btn_achieve_step_streak")
                 ) {
                     Text(
-                        text = "Achieve ${String.format("%,d", stepGoal)} Step Streak 🔥",
+                        text = if (isAchieveDisabled) {
+                            "Streak Goal Achieved 🔥 (Completed)"
+                        } else {
+                            "Achieve ${String.format("%,d", stepGoal)} Step Streak 🔥"
+                        },
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        color = StepsFireOrange
+                        color = if (isAchieveDisabled) {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        } else {
+                            StepsFireOrange
+                        }
                     )
                 }
 
@@ -1072,6 +1105,14 @@ fun StepCounterScreen(
             }
         )
     }
+
+    // Temporary streak celebration animation overlay (only if streak achieved)
+    if (showStreakCelebration && isStreakAchieved) {
+        StreakCelebrationOverlay(
+            stepGoal = stepGoal,
+            onDismiss = { showStreakCelebration = false }
+        )
+    }
 }
 
 // Steps Circular Progress Ring in Light Theme
@@ -1171,21 +1212,12 @@ fun StepsRing(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            if (isStreakAchieved) {
-                Text(
-                    text = "Streak achieved 🔥",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = StepsFireOrange
-                )
-            } else {
-                Text(
-                    text = "$percentage% of ${"%,d".format(goal)}",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = accentColor
-                )
-            }
+            Text(
+                text = if (isStreakAchieved) "$percentage% of ${"%,d".format(goal)}" else "$percentage% of ${"%,d".format(goal)}",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = accentColor
+            )
         }
     }
 }

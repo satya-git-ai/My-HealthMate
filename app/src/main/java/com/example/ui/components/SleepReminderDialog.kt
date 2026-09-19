@@ -375,9 +375,12 @@ fun SleepReminderDialog(
                                 isTestingSound = true
                             }
                         },
+                        enabled = enabled,
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isTestingSound) MaterialTheme.colorScheme.error else Color(0xFF3F51B5)
+                            containerColor = if (isTestingSound) MaterialTheme.colorScheme.error else Color(0xFF3F51B5),
+                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                         ),
                         modifier = Modifier
                             .height(36.dp)

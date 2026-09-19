@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1329" />
+      <stop offset="50%" stop-color="#061f2d" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+    
+    <linearGradient id="emeraldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34D399" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#00E5FF" stop-opacity="0.9" />
+    </linearGradient>
+
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background rounded squircle with subtle border -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGradient)" />
+  <rect width="510" height="510" x="1" y="1" rx="114" fill="none" stroke="url(#emeraldGradient)" stroke-width="2.5" stroke-opacity="0.4" />
+
+  <!-- Ambient Glow -->
+  <circle cx="256" cy="256" r="180" fill="url(#centerGlow)" />
+
+  <!-- Dynamic Running Stride & Health Pulse Hybrid Emblem -->
+  <g filter="url(#neonGlow)" transform="translate(0, 0)">
+    <!-- Outer Arc / Wellness Track -->
+    <path d="M 140 270 C 140 180, 200 130, 290 130 C 370 130, 400 190, 390 260" 
+          fill="none" 
+          stroke="url(#emeraldGradient)" 
+          stroke-width="26" 
+          stroke-linecap="round" />
+
+    <!-- Energetic Heart Pulse & Forward Step Ribbon -->
+    <path d="M 120 290 L 195 290 L 230 200 L 275 350 L 315 260 L 350 290 L 395 290" 
+          fill="none" 
+          stroke="#00E5FF" 
+          stroke-width="22" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+
+    <!-- Dynamic Runner Head / Vitality Spark -->
+    <circle cx="340" cy="170" r="22" fill="#10B981" />
+    <circle cx="340" cy="170" r="12" fill="#FFFFFF" />
+
+    <!-- Stride Accent Dots -->
+    <circle cx="160" cy="350" r="10" fill="#34D399" opacity="0.8" />
+    <circle cx="210" cy="380" r="12" fill="#00E5FF" opacity="0.9" />
+    <circle cx="270" cy="395" r="14" fill="#10B981" />
+    <circle cx="330" cy="380" r="12" fill="#059669" opacity="0.9" />
+    <circle cx="375" cy="350" r="10" fill="#047857" opacity="0.8" />
+  </g>
+</svg>

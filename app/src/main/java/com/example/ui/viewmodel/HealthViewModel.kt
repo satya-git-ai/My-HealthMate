@@ -210,6 +210,12 @@ class HealthViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun resetWater() {
+        viewModelScope.launch {
+            repository.resetTodayWater()
+        }
+    }
+
     // GPS Walking & Workout Tracking Actions
     fun startGpsWalking(): Boolean {
         gpsTrackerManager.setUserHeight(userSettings.value.userHeightCm)
@@ -229,7 +235,7 @@ class HealthViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun checkGpsProviderStatus() {
-        gpsTrackerManager.checkProviderStatus()
+        // No-op: zero GPS interaction
     }
 
     fun startWorkout(workoutType: String = "Normal Indoor Walk"): Boolean {
@@ -452,7 +458,14 @@ class HealthViewModel(application: Application) : AndroidViewModel(application) 
                 status = action
             )
 
-            if (action == "Snoozed") {
+            if (action == "Taken") {
+                val med = repository.getMedicineById(medicineId)
+                if (med != null && med.repeatType.equals("Once", ignoreCase = true)) {
+                    val disabledMed = med.copy(isActive = false)
+                    repository.insertOrUpdateMedicine(disabledMed)
+                    medicineReminderScheduler.cancelMedicine(medicineId)
+                }
+            } else if (action == "Snoozed") {
                 medicineReminderScheduler.scheduleSnooze(
                     medicineId = medicineId,
                     name = medicineName,

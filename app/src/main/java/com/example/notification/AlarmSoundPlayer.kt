@@ -11,6 +11,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -103,6 +104,8 @@ class AlarmSoundPlayer(private val context: Context) {
         currentJob = playerScope.launch {
             try {
                 playSoundOnce(soundType, volume)
+            } catch (e: CancellationException) {
+                // Expected when playback job is cancelled
             } catch (e: Exception) {
                 Log.e("AlarmSoundPlayer", "Error playing sound: $soundType", e)
             } finally {
@@ -126,6 +129,8 @@ class AlarmSoundPlayer(private val context: Context) {
                     playSoundOnce(soundType, volume)
                     delay(800)
                 }
+            } catch (e: CancellationException) {
+                // Expected when continuous sound is stopped or dismissed
             } catch (e: Exception) {
                 Log.e("AlarmSoundPlayer", "Error in playContinuous: $soundType", e)
             } finally {

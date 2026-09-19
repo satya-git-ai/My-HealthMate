@@ -1,12 +1,5 @@
 package com.example.ui.screens
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -29,12 +22,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOff
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,10 +35,8 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,20 +44,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.location.GpsStatus
 import com.example.ui.components.InteractiveRouteMap
-import com.example.ui.components.MetricCard
 import com.example.ui.theme.HealthBlue
 import com.example.ui.theme.HealthCyan
 import com.example.ui.theme.HealthEmerald
@@ -82,61 +63,10 @@ fun GpsTrackerScreen(
     onBack: () -> Unit,
     onViewRouteDetail: (Long) -> Unit,
     onHome: () -> Unit = onBack,
-    onOpenGpsPermissionScreen: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val workoutState by viewModel.workoutLiveState.collectAsState()
-    val lastWorkoutId by viewModel.lastSavedWorkoutId.collectAsState()
-
     var selectedWorkoutType by remember { mutableStateOf("Normal Indoor Walk") }
-
-    fun checkLocationPermissionGranted(): Boolean {
-        val fine = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-        val coarse = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-        return fine || coarse
-    }
-
-    var hasLocationPermission by remember {
-        mutableStateOf(checkLocationPermissionGranted())
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                hasLocationPermission = checkLocationPermissionGranted()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { result ->
-        hasLocationPermission = (result[Manifest.permission.ACCESS_FINE_LOCATION] == true) ||
-                (result[Manifest.permission.ACCESS_COARSE_LOCATION] == true)
-        if (hasLocationPermission) {
-            viewModel.startWorkout(selectedWorkoutType)
-        }
-    }
-
-    fun openAppInfo() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", context.packageName, null)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(intent)
-    }
 
     val hours = workoutState.durationSeconds / 3600
     val minutes = (workoutState.durationSeconds % 3600) / 60
@@ -176,7 +106,7 @@ fun GpsTrackerScreen(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "GPS Activity Tracker",
+                    text = "Activity & Workout Tracker",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -196,127 +126,10 @@ fun GpsTrackerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Transparent Glossy Permission Warning Card if Denied
-        if (!hasLocationPermission) {
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0x1F00E5FF)),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.5.dp,
-                    androidx.compose.ui.graphics.Brush.verticalGradient(
-                        listOf(
-                            Color(0x8000E5FF),
-                            Color(0x3000E676),
-                            Color(0x15FFFFFF)
-                        )
-                    )
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("glossy_location_permission_card")
-            ) {
-                Column(modifier = Modifier.padding(18.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0x3300E5FF))
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LocationOn,
-                                contentDescription = "GPS Access",
-                                tint = Color(0xFF00E5FF),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Text(
-                                text = "GPS & Location Required",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                            Text(
-                                text = "High-precision outdoor route tracing",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFF00E5FF)
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "To draw your exact outdoor walking/running path, calculate pace, and track elevation curves, enable GPS access. Location is only accessed during active workouts.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f),
-                        lineHeight = 18.sp
-                    )
-                    Spacer(modifier = Modifier.height(14.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                locationPermissionLauncher.launch(
-                                    arrayOf(
-                                        Manifest.permission.ACCESS_FINE_LOCATION,
-                                        Manifest.permission.ACCESS_COARSE_LOCATION
-                                    )
-                                )
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E5FF)),
-                            shape = RoundedCornerShape(14.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(46.dp)
-                                .testTag("grant_location_permission_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LocationOn,
-                                contentDescription = null,
-                                tint = Color(0xFF07111E),
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Prompt GPS",
-                                color = Color(0xFF07111E),
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 13.sp
-                            )
-                        }
-
-                        OutlinedButton(
-                            onClick = { onOpenGpsPermissionScreen() },
-                            shape = RoundedCornerShape(14.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x6000E5FF)),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color(0x1000E5FF)
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(46.dp)
-                                .testTag("open_gps_full_screen_button")
-                        ) {
-                            Text(
-                                text = "Why GPS?",
-                                color = Color(0xFF00E5FF),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         // Activity Type Chips (Normal Indoor Walk / Outdoor Walk / Outdoor Run)
         if (!workoutState.isTracking) {
             Text(
-                text = "ACTIVITY TYPE",
+                text = "WORKOUT TYPE",
                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -388,20 +201,6 @@ fun GpsTrackerScreen(
             Spacer(modifier = Modifier.height(14.dp))
         }
 
-        // Interactive GPS Route Map
-        InteractiveRouteMap(
-            routePoints = workoutState.routePoints,
-            currentLat = workoutState.currentLatitude,
-            currentLng = workoutState.currentLongitude,
-            accuracyMeters = workoutState.accuracyMeters,
-            isTracking = workoutState.isTracking,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(280.dp)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
         // Live Workout Stats Card
         Card(
             shape = RoundedCornerShape(24.dp),
@@ -450,7 +249,7 @@ fun GpsTrackerScreen(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // 3 Metrics Row
+                // 4 Metrics Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
@@ -522,16 +321,7 @@ fun GpsTrackerScreen(
         if (!workoutState.isTracking) {
             Button(
                 onClick = {
-                    if (hasLocationPermission) {
-                        viewModel.startWorkout(selectedWorkoutType)
-                    } else {
-                        locationPermissionLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION
-                            )
-                        )
-                    }
+                    viewModel.startWorkout(selectedWorkoutType)
                 },
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = HealthEmerald),

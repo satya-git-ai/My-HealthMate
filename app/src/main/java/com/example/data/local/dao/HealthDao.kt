@@ -67,6 +67,9 @@ interface HealthDao {
     @Query("DELETE FROM water_logs WHERE id = :id")
     suspend fun deleteWaterLogById(id: Long)
 
+    @Query("DELETE FROM water_logs WHERE date = :date")
+    suspend fun clearWaterLogsForDate(date: String)
+
     @Transaction
     suspend fun addWater(date: String, amountMl: Int) {
         insertWaterLog(WaterLog(date = date, amountMl = amountMl))
@@ -86,6 +89,15 @@ interface HealthDao {
         if (existing != null) {
             val newAmount = (existing.waterMl - latest.amountMl).coerceAtLeast(0)
             insertOrUpdateDailyRecord(existing.copy(waterMl = newAmount))
+        }
+    }
+
+    @Transaction
+    suspend fun resetWater(date: String) {
+        clearWaterLogsForDate(date)
+        val existing = getDailyRecordSync(date)
+        if (existing != null) {
+            insertOrUpdateDailyRecord(existing.copy(waterMl = 0))
         }
     }
 }

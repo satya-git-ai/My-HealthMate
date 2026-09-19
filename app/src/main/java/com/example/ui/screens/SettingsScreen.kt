@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.TrackChanges
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -138,7 +139,7 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Personal Health Profile Entry
+        // Plan Customization Entry
         Card(
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -146,7 +147,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onNavigateProfile() }
-                .testTag("settings_profile_entry")
+                .testTag("settings_plan_customization_entry")
         ) {
             Row(
                 modifier = Modifier
@@ -163,7 +164,7 @@ fun SettingsScreen(
                             .background(HealthCyan.copy(alpha = 0.15f), shape = CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.FitnessCenter,
+                            imageVector = Icons.Default.Tune,
                             contentDescription = null,
                             tint = HealthCyan,
                             modifier = Modifier.size(24.dp)
@@ -172,12 +173,12 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
                         Text(
-                            text = "Health Profile & Biometrics",
+                            text = "Plan Customization",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = "Weight: %.0f kg • Height: %.0f cm • Age: %d".format(userSettings.userWeightKg, userSettings.userHeightCm, userSettings.userAge),
+                            text = "Target steps • Calorie deficit • Hydration & activity goals",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -310,13 +311,15 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(14.dp))
 
         // Permission Configuration Entry
+        var showPermissionDialog by remember { mutableStateOf(false) }
+
         Card(
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onNavigatePermissions() }
+                .clickable { showPermissionDialog = true }
                 .testTag("settings_permissions_entry")
         ) {
             Row(
@@ -343,12 +346,12 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
                         Text(
-                            text = "Permissions & Sensors",
+                            text = "Sensors & Notifications",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = "Activity sensor, GPS & Notifications",
+                            text = "Physical Activity sensor & Reminders",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -362,6 +365,50 @@ fun SettingsScreen(
                     modifier = Modifier.size(16.dp)
                 )
             }
+        }
+
+        if (showPermissionDialog) {
+            AlertDialog(
+                onDismissRequest = { showPermissionDialog = false },
+                title = {
+                    Text(
+                        text = "Sensors & Privacy",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                },
+                text = {
+                    Column {
+                        Text(
+                            text = "• Pedometer / Physical Activity: Tracks steps, cadence, and distance locally on device hardware.\n\n• Notifications: Timely alerts for water intake, bedtime, wakeup, and medication reminders.\n\n• Zero GPS: No location sensors or GPS permissions are used.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            lineHeight = 22.sp
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = android.net.Uri.fromParts("package", context.packageName, null)
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(intent)
+                            showPermissionDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = HealthCyan)
+                    ) {
+                        Text("App Settings", color = Color.Black, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showPermissionDialog = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Text("Close", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -506,7 +553,7 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "My HealthMate persists your steps, hydration logs, and GPS workouts locally in an on-device Room SQLite database. Your personal location trails and health stats are never uploaded to cloud servers without your explicit intent.",
+                    text = "My HealthMate persists your steps and hydration logs locally on your device. Your health stats are never uploaded to cloud servers without your explicit intent.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 18.sp

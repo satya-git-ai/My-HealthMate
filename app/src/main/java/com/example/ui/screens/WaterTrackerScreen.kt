@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalDrink
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Warning
@@ -59,15 +60,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.components.HydrationCelebrationOverlay
 import com.example.ui.components.WaterWaveIndicator
 import com.example.ui.theme.HealthBlue
 import com.example.ui.theme.HealthCyan
+import com.example.ui.theme.HealthIndigo
 import com.example.ui.viewmodel.HealthViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -86,12 +93,21 @@ fun WaterTrackerScreen(
 
     val currentWater = todayRecord?.waterMl ?: 0
     val waterGoal = userSettings.waterGoalMl
+    val isWaterTargetAchieved = currentWater >= waterGoal && waterGoal > 0
 
     var showCustomDialog by remember { mutableStateOf(false) }
     var customAmountText by remember { mutableStateOf("300") }
     var customWarningMessage by remember { mutableStateOf<String?>(null) }
     var showReminderSettingsDialog by remember { mutableStateOf(false) }
     var bannerFeedbackMessage by remember { mutableStateOf<String?>(null) }
+    var showHydrationCelebration by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
+
+    androidx.compose.runtime.LaunchedEffect(isWaterTargetAchieved) {
+        if (isWaterTargetAchieved && currentWater > 0) {
+            showHydrationCelebration = true
+        }
+    }
 
     val logTimeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
     val isReminderEnabled = userSettings.waterReminderEnabled
@@ -134,6 +150,18 @@ fun WaterTrackerScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             IconButton(
+                onClick = { showResetDialog = true },
+                enabled = currentWater > 0,
+                modifier = Modifier.testTag("water_tracker_reset_top_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Reset",
+                    tint = if (currentWater > 0) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f)
+                )
+            }
+
+            IconButton(
                 onClick = onHome,
                 modifier = Modifier.testTag("water_tracker_home_button")
             ) {
@@ -145,8 +173,8 @@ fun WaterTrackerScreen(
             }
         }
 
-        // Live Feedback Banner (e.g. after testing alarm)
-        if (bannerFeedbackMessage != null) {
+        // Live Feedback Banner (only displayed when reminder is enabled)
+        if (bannerFeedbackMessage != null && isReminderEnabled) {
             Spacer(modifier = Modifier.height(12.dp))
             Card(
                 shape = RoundedCornerShape(14.dp),
@@ -257,37 +285,19 @@ fun WaterTrackerScreen(
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "Timely Drink Reminder",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            if (isReminderEnabled) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.surfaceVariant,
-                                            shape = RoundedCornerShape(6.dp)
-                                        )
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                ) {
-                                    Text(
-                                        text = if (isReminderEnabled) "ACTIVE" else "OFF",
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isReminderEnabled) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
+                            Text(
+                                text = "Timely Drink Reminder",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
 
-                            Spacer(modifier = Modifier.height(2.dp))
+                            Spacer(modifier = Modifier.height(3.dp))
 
                             Text(
                                 text = if (isReminderEnabled)
-                                    "Every ${userSettings.waterReminderIntervalMinutes} min • Active schedule"
+                                    "Every ${userSettings.waterReminderIntervalMinutes} min"
                                 else
-                                    "Tap to set drink interval schedule",
+                                    "Tap to configure drink reminder schedule",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (isReminderEnabled) HealthBlue else MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -310,6 +320,8 @@ fun WaterTrackerScreen(
                             )
                             if (isChecked) {
                                 bannerFeedbackMessage = "Timely reminders scheduled! Next: ${viewModel.getNextWaterReminderTime()}"
+                            } else {
+                                bannerFeedbackMessage = null
                             }
                         },
                         modifier = Modifier.testTag("water_reminder_switch")
@@ -367,9 +379,9 @@ fun WaterTrackerScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Quick Add Buttons Row
+        // Quick Add Buttons Row in a continuous line
         Text(
-            text = "Quick Log water / juice /liquids",
+            text = "Quick Log water / juice / liquids",
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -378,73 +390,124 @@ fun WaterTrackerScreen(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Button(
-                onClick = { viewModel.addWater(250) },
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = HealthBlue),
+                onClick = { viewModel.addWater(150) },
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = HealthCyan.copy(alpha = 0.9f)),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
                 modifier = Modifier
                     .weight(1f)
-                    .height(52.dp)
+                    .height(50.dp)
+                    .testTag("water_add_150")
+            ) {
+                Icon(Icons.Default.WaterDrop, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(text = "+150ml", fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1)
+            }
+
+            Button(
+                onClick = { viewModel.addWater(250) },
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = HealthBlue),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp)
                     .testTag("water_add_250")
             ) {
-                Icon(Icons.Default.WaterDrop, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "+250 ml", fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.WaterDrop, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(text = "+250ml", fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1)
             }
 
             Button(
                 onClick = { viewModel.addWater(500) },
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = HealthCyan),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0284C7)),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
                 modifier = Modifier
                     .weight(1f)
-                    .height(52.dp)
+                    .height(50.dp)
                     .testTag("water_add_500")
             ) {
-                Icon(Icons.Default.LocalDrink, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "+500 ml", fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.LocalDrink, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(text = "+500ml", fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1)
             }
 
-            OutlinedButton(
+            // Custom Button clearly displayed in continuous line with filled style
+            Button(
                 onClick = { showCustomDialog = true },
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = HealthIndigo,
+                    contentColor = Color.White
+                ),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
                 modifier = Modifier
-                    .weight(1f)
-                    .height(52.dp)
+                    .weight(1.1f)
+                    .height(50.dp)
                     .testTag("water_add_custom")
             ) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "Custom")
+                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(text = "Custom", fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1)
             }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Undo Last Entry Button
+        // Actions: Undo Last Entry and Reset Today's Hydration
         val canUndo = currentWater > 0
-        OutlinedButton(
-            onClick = { viewModel.undoWater() },
-            enabled = canUndo,
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = HealthBlue,
-                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("water_undo_button")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Undo,
-                contentDescription = "Undo",
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Undo Last Entry")
+            OutlinedButton(
+                onClick = { viewModel.undoWater() },
+                enabled = canUndo,
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = HealthBlue,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .testTag("water_undo_button")
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Undo,
+                    contentDescription = "Undo",
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Undo")
+            }
+
+            OutlinedButton(
+                onClick = { showResetDialog = true },
+                enabled = canUndo,
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .testTag("water_reset_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Reset",
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Reset")
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -461,11 +524,27 @@ fun WaterTrackerScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            Text(
-                text = "Goal: %,d ml".format(waterGoal),
-                style = MaterialTheme.typography.labelMedium,
-                color = HealthBlue
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (waterLogs.isNotEmpty()) {
+                    TextButton(
+                        onClick = { showResetDialog = true },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                        modifier = Modifier.testTag("water_logs_reset_button")
+                    ) {
+                        Text(
+                            text = "Reset All",
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+                Text(
+                    text = "Goal: %,d ml".format(waterGoal),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = HealthBlue
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -698,9 +777,65 @@ fun WaterTrackerScreen(
                 bannerFeedbackMessage = if (enabled) {
                     "Timely reminder set every $interval min! Next: ${viewModel.getNextWaterReminderTime()}"
                 } else {
-                    "Timely hydration reminders paused"
+                    null
                 }
             }
+        )
+    }
+
+    // Reset Today's Water Confirmation Dialog
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(28.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = "Reset Today's Hydration?",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    text = "This will clear all logged water entries for today and reset your hydration progress back to 0 ml.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.resetWater()
+                        showResetDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.testTag("confirm_reset_water_button")
+                ) {
+                    Text("Reset", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showResetDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Temporary hydration celebration animation overlay (only if hydration target achieved)
+    if (showHydrationCelebration && isWaterTargetAchieved) {
+        HydrationCelebrationOverlay(
+            waterGoalMl = waterGoal,
+            onDismiss = { showHydrationCelebration = false }
         )
     }
 }
@@ -723,7 +858,7 @@ fun HydrationReminderDialog(
     var endHour by remember { mutableIntStateOf(userSettings.waterReminderEndHour) }
     var vibrateEnabled by remember { mutableStateOf(userSettings.waterVibrateEnabled) }
 
-    val intervalOptions = listOf(30, 45, 60, 90, 120, 180)
+    val intervalOptions = listOf(15, 30, 45, 60, 90, 120)
     val startHourOptions = listOf(6, 7, 8, 9, 10)
     val endHourOptions = listOf(19, 20, 21, 22, 23)
 
@@ -782,12 +917,12 @@ fun HydrationReminderDialog(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Timely Water Reminders",
+                                text = if (enabled) "Timely Drink Reminder: Active" else "Timely Drink Reminder: Off",
                                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
-                                text = if (enabled) "Reminders active throughout the day" else "Reminders are disabled",
+                                text = if (enabled) "Reminders active every $intervalMinutes min" else "Reminders are disabled",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -821,7 +956,7 @@ fun HydrationReminderDialog(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     intervalOptions.take(3).forEach { mins ->
-                        val label = if (mins < 60) "${mins}m" else "${mins / 60} hr"
+                        val label = "${mins}m"
                         FilterChip(
                             selected = intervalMinutes == mins,
                             onClick = { intervalMinutes = mins },
@@ -842,9 +977,9 @@ fun HydrationReminderDialog(
                 ) {
                     intervalOptions.drop(3).forEach { mins ->
                         val label = when (mins) {
+                            60 -> "1 hr"
                             90 -> "1.5 hr"
                             120 -> "2 hr"
-                            180 -> "3 hr"
                             else -> "${mins}m"
                         }
                         FilterChip(
@@ -869,13 +1004,14 @@ fun HydrationReminderDialog(
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Start and end times so you aren't disturbed while sleeping",
+                    text = "Reminders run every $intervalMinutes min between ${formatHour12(startHour)} and ${formatHour12(endHour)} • ${endHour - startHour} active hours daily",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -883,49 +1019,43 @@ fun HydrationReminderDialog(
                 ) {
                     // Start Hour
                     Card(
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(14.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Column(modifier = Modifier.padding(10.dp)) {
-                            Text("Wake / Start", style = MaterialTheme.typography.labelSmall, color = HealthBlue)
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "Wake / Start Time",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                                color = HealthBlue
+                            )
                             Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = formatHour12(startHour),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Text("${startHour}:00 AM", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
-                                Row {
-                                    startHourOptions.forEach { hour ->
-                                        if (hour == startHour) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .background(HealthBlue, CircleShape)
-                                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                                            ) {
-                                                Text("$hour", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                 startHourOptions.forEach { hour ->
+                                    val isSelected = hour == startHour
                                     Box(
+                                        contentAlignment = Alignment.Center,
                                         modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSelected) HealthBlue else MaterialTheme.colorScheme.surface)
                                             .clickable(enabled = enabled) { startHour = hour }
-                                            .background(
-                                                if (hour == startHour) HealthBlue else Color.Transparent,
-                                                shape = RoundedCornerShape(6.dp)
-                                            )
-                                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                                            .padding(vertical = 6.dp)
                                     ) {
                                         Text(
-                                            text = "$hour AM",
+                                            text = formatHourShort(hour),
                                             fontSize = 10.sp,
-                                            color = if (hour == startHour) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
@@ -935,30 +1065,43 @@ fun HydrationReminderDialog(
 
                     // End Hour
                     Card(
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(14.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Column(modifier = Modifier.padding(10.dp)) {
-                            Text("Sleep / End", style = MaterialTheme.typography.labelSmall, color = HealthBlue)
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "Sleep / End Time",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                                color = HealthBlue
+                            )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("${endHour - 12}:00 PM", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                text = formatHour12(endHour),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
                                 endHourOptions.forEach { hour ->
+                                    val isSelected = hour == endHour
                                     Box(
+                                        contentAlignment = Alignment.Center,
                                         modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSelected) HealthBlue else MaterialTheme.colorScheme.surface)
                                             .clickable(enabled = enabled) { endHour = hour }
-                                            .background(
-                                                if (hour == endHour) HealthBlue else Color.Transparent,
-                                                shape = RoundedCornerShape(6.dp)
-                                            )
-                                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                                            .padding(vertical = 6.dp)
                                     ) {
                                         Text(
-                                            text = "${hour - 12} PM",
+                                            text = formatHourShort(hour),
                                             fontSize = 10.sp,
-                                            color = if (hour == endHour) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
@@ -1020,4 +1163,24 @@ fun HydrationReminderDialog(
             }
         }
     )
+}
+
+private fun formatHour12(hour: Int): String {
+    val h = when {
+        hour == 0 -> 12
+        hour > 12 -> hour - 12
+        else -> hour
+    }
+    val amPm = if (hour < 12) "AM" else "PM"
+    return "$h:00 $amPm"
+}
+
+private fun formatHourShort(hour: Int): String {
+    val h = when {
+        hour == 0 -> 12
+        hour > 12 -> hour - 12
+        else -> hour
+    }
+    val amPm = if (hour < 12) "AM" else "PM"
+    return "$h $amPm"
 }

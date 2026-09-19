@@ -170,6 +170,11 @@ class HealthRepository(
         healthDao.undoLastWater(today)
     }
 
+    suspend fun resetTodayWater() = withContext(Dispatchers.IO) {
+        val today = getTodayDate()
+        healthDao.resetWater(today)
+    }
+
     suspend fun saveWorkoutSession(
         startTime: Long,
         endTime: Long,

@@ -100,6 +100,13 @@ class MedicineReminderReceiver : BroadcastReceiver() {
                                 date = todayDate
                             )
                         )
+                        if (medicineId > 0) {
+                            val med = medDao.getMedicineById(medicineId)
+                            if (med != null && med.repeatType.equals("Once", ignoreCase = true)) {
+                                medDao.updateMedicine(med.copy(isActive = false))
+                                scheduler.cancelMedicine(medicineId)
+                            }
+                        }
                     } catch (e: Exception) {
                         Log.e("MedReminderReceiver", "Error recording taken action", e)
                     } finally {

@@ -88,9 +88,11 @@ import com.example.notification.SleepSoundType
 import com.example.ui.components.CircularGoalProgress
 import com.example.ui.components.GlassCard
 import com.example.ui.components.GlowPill
+import com.example.ui.components.HydrationCelebrationOverlay
 import com.example.ui.components.MetricCard
 import com.example.ui.components.SleepAlertDialog
 import com.example.ui.components.SleepReminderDialog
+import com.example.ui.components.StreakCelebrationOverlay
 import com.example.ui.theme.GlowBlue
 import com.example.ui.theme.GlowCyan
 import com.example.ui.theme.GlowEmerald
@@ -131,10 +133,24 @@ fun HomeScreen(
 
     val isStepStreakAchieved = currentSteps >= stepGoal && stepGoal > 0
     val isWaterTargetAchieved = currentWater >= waterGoal && waterGoal > 0
+    var showStreakCelebration by remember { mutableStateOf(false) }
+    var showHydrationCelebration by remember { mutableStateOf(false) }
+
+    androidx.compose.runtime.LaunchedEffect(isStepStreakAchieved) {
+        if (isStepStreakAchieved && currentSteps > 0) {
+            showStreakCelebration = true
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(isWaterTargetAchieved) {
+        if (isWaterTargetAchieved && currentWater > 0) {
+            showHydrationCelebration = true
+        }
+    }
 
     val greeting = rememberGreeting()
     val motivationalMessage = when {
-        isStepStreakAchieved -> "Streak achieved 🔥 • %,d kcal burned".format(calories)
+        isStepStreakAchieved -> "🎉 Goal crushed! Incredible achievement today!"
         currentSteps >= stepGoal -> "🎉 Goal crushed! Incredible achievement today!"
         currentSteps >= (stepGoal * 0.75f) -> "You're almost at your daily goal! Push for the finish!"
         currentSteps >= (stepGoal * 0.5f) -> "Great job! Keep moving! You're well over halfway."
@@ -247,15 +263,18 @@ fun HomeScreen(
                     )
                 }
 
-                // Application info icon
+                // Application info icon (compact size)
                 IconButton(
                     onClick = { showCreatorDialog = true },
-                    modifier = Modifier.testTag("home_creator_indicator_button")
+                    modifier = Modifier
+                        .size(36.dp)
+                        .testTag("home_creator_indicator_button")
                 ) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = "Application Info",
-                        tint = GlowCyan
+                        tint = GlowCyan,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
@@ -544,7 +563,9 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = if (isStepStreakAchieved) {
-                                "Streak achieved 🔥 • %,d kcal burned".format(calories)
+                                "%,d kcal burned".format(calories)
+                            } else if (currentSteps == 0) {
+                                "${String.format("%,d", stepGoal)} Streak Goal"
                             } else {
                                 "${String.format("%,d", stepGoal)} Streak Goal • %,d to streak 🔥".format(maxOf(0, stepGoal - currentSteps))
                             },
@@ -556,9 +577,9 @@ fun HomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Quick Actions Row (Walk, Hydration +250ml, Stopwatch, Sleep Alarm)
+        // Quick Actions Row (Walk, Hydration +250ml, Stopwatch, Sleep Alarm) - Moved 1 Step Upward
         Text(
             text = "Quick Actions",
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -717,81 +738,7 @@ fun HomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Dedicated Live Stopwatch Quick Access Glass Card
-        GlassCard(
-            glowColor = GlowOrange.copy(alpha = 0.25f),
-            glassAlpha = 0.82f,
-            shape = RoundedCornerShape(22.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("home_stopwatch_tile_card"),
-            onClick = { onNavigate("stopwatch") }
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(GlowOrange.copy(alpha = 0.2f))
-                            .border(1.2.dp, GlowOrange.copy(alpha = 0.6f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Timer,
-                            contentDescription = "Stopwatch",
-                            tint = GlowOrange,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "Stop Watch",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = textPrimary
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            GlowPill(glowColor = GlowOrange) {
-                                Text(
-                                    text = "0.01s",
-                                    fontSize = 9.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = GlowOrange,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp)
-                                )
-                            }
-                        }
-                        Text(
-                            text = "Start / Stop • Pause / Continue • Lap splits",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = textSecondary
-                        )
-                    }
-                }
-
-                Icon(
-                    imageVector = Icons.Default.ArrowForward,
-                    contentDescription = "Open Stopwatch",
-                    tint = GlowOrange,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // GetSteps Weight Loss Walking Calculator Dedicated Card
         GlassCard(
@@ -867,6 +814,80 @@ fun HomeScreen(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = "Open Calculator",
                     tint = GlowEmerald,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Dedicated Live Stopwatch Quick Access Glass Card
+        GlassCard(
+            glowColor = GlowOrange.copy(alpha = 0.25f),
+            glassAlpha = 0.82f,
+            shape = RoundedCornerShape(22.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("home_stopwatch_tile_card"),
+            onClick = { onNavigate("stopwatch") }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(GlowOrange.copy(alpha = 0.2f))
+                            .border(1.2.dp, GlowOrange.copy(alpha = 0.6f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Timer,
+                            contentDescription = "Stopwatch",
+                            tint = GlowOrange,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Stop Watch",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = textPrimary
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            GlowPill(glowColor = GlowOrange) {
+                                Text(
+                                    text = "0.01s",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = GlowOrange,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp)
+                                )
+                            }
+                        }
+                        Text(
+                            text = "Start / Stop • Pause / Continue • Lap splits",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = textSecondary
+                        )
+                    }
+                }
+
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = "Open Stopwatch",
+                    tint = GlowOrange,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -1026,7 +1047,7 @@ fun HomeScreen(
                 icon = Icons.Default.DirectionsRun,
                 iconTint = GlowEmerald,
                 iconBgColor = GlowEmerald.copy(alpha = 0.2f),
-                badgeText = if (isStepStreakAchieved) "Streak achieved 🔥" else "${String.format("%,d", stepGoal)} Streak Goal",
+                badgeText = if (isStepStreakAchieved) "%,d kcal burned".format(calories) else "${String.format("%,d", stepGoal)} Streak Goal",
                 badgeColor = if (isStepStreakAchieved) GlowOrange else GlowEmerald,
                 modifier = Modifier.weight(1f),
                 testTag = "metric_steps_card",
@@ -1307,6 +1328,7 @@ fun HomeScreen(
                             viewModel.testSleepSound(userSettings.sleepSoundType, userSettings.sleepSoundVolume)
                             Toast.makeText(context, "Playing test sound: ${sleepSound.title}", Toast.LENGTH_SHORT).show()
                         },
+                        enabled = userSettings.sleepReminderEnabled,
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier
                             .height(44.dp)
@@ -1431,6 +1453,22 @@ fun HomeScreen(
                 viewModel.snoozeActiveWakeup()
                 Toast.makeText(context, "Alarm snoozed for 10 minutes", Toast.LENGTH_SHORT).show()
             }
+        )
+    }
+
+    // Temporary streak celebration animation overlay (only if streak achieved)
+    if (showStreakCelebration && isStepStreakAchieved) {
+        StreakCelebrationOverlay(
+            stepGoal = stepGoal,
+            onDismiss = { showStreakCelebration = false }
+        )
+    }
+
+    // Temporary hydration celebration animation overlay (only if hydration target achieved)
+    if (showHydrationCelebration && isWaterTargetAchieved) {
+        HydrationCelebrationOverlay(
+            waterGoalMl = waterGoal,
+            onDismiss = { showHydrationCelebration = false }
         )
     }
 }
