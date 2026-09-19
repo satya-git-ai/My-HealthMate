@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My HealthMate | Daily Wellness Companion</title>
+    
+    <!-- Tailwind CSS for utility classes and responsive layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter for a clean, modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for feature icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Fallback dark background */
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Gradients */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        .shape {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+
+        .shape-1 {
+            top: -10%; left: -10%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            bottom: -20%; right: -10%;
+            width: 60vw; height: 60vw;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            top: 30%; left: 40%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, #10b981 0%, transparent 70%);
+            animation-delay: -10s;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+            box-shadow: 0 15px 45px 0 rgba(0, 0, 0, 0.4);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .glass-button {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -50px) rotate(10deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.4); 
+        }
+
+        /* Text Gradient */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #60a5fa, #a78bfa, #34d399);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative">
+
+    <!-- Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <!-- App Logo -->
+                    <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/app/my_healthmate_logo_1024x1024.png" alt="My HealthMate Logo" class="w-10 h-10 rounded-xl shadow-lg object-cover">
+                    <span class="font-bold text-2xl tracking-tight text-white">My HealthMate</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#features" class="hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Features</a>
+                        <a href="#gallery" class="hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Gallery</a>
+                        <a href="#tech" class="hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Technology</a>
+                        <a href="https://github.com/satya-git-ai/My-HealthMate/releases/download/MyHealthMate1.0.0v/My.HealthMate.apk" download="My HealthMate.apk" class="glass-button text-white px-5 py-2 rounded-full font-medium shadow-md">Download Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="flex-grow pt-32 pb-16 flex items-center z-10 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Hero Text -->
+                <div class="text-center lg:text-left z-10">
+                    <div class="inline-block animate-fade-in-up">
+                        <span class="glass px-4 py-1.5 rounded-full text-sm font-semibold text-blue-300 tracking-wide uppercase shadow-sm border border-blue-400/30">
+                            Available for Android
+                        </span>
+                    </div>
+                    <h1 class="mt-6 text-5xl md:text-6xl font-extrabold tracking-tight mb-6 animate-fade-in-up delay-100 leading-tight">
+                        Your Comprehensive Companion for <br>
+                        <span class="text-gradient">Daily Wellness.</span>
+                    </h1>
+                    <p class="mt-4 text-lg md:text-xl text-gray-300 mb-8 animate-fade-in-up delay-200 max-w-2xl mx-auto lg:mx-0 font-light">
+                        Track steps, monitor hydration, set vital medicine and sleep reminders, all in one beautifully crafted, high-precision dashboard.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in-up delay-300">
+                        <a href="https://github.com/satya-git-ai/My-HealthMate/releases/download/MyHealthMate1.0.0v/My.HealthMate.apk" download="My HealthMate.apk" class="glass-button text-white text-lg px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 group">
+                            <i class="fa-solid fa-download text-xl group-hover:scale-110 transition-transform"></i>
+                            Get now
+                        </a>
+                        <a href="#features" class="glass px-8 py-4 rounded-2xl font-semibold text-white flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10">
+                            Explore Features
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Visual (Floating Glass Panel) -->
+                <div class="relative hidden lg:block animate-fade-in-up delay-400">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl blur-3xl opacity-30 animate-pulse"></div>
+                    <div class="glass-panel rounded-3xl p-8 relative transform rotate-y-[-10deg] rotate-x-[5deg] perspective-1000 shadow-2xl">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                            <h3 class="text-xl font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-blue-400"></i> Daily Overview
+                            </h3>
+                            <span class="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-md border border-green-500/30">Syncing Active</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="glass p-4 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-shoe-prints text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-400">Steps Today</p>
+                                        <p class="font-bold text-lg">12,000 / 12,000</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-fire text-orange-400 text-xl animate-pulse"></i>
+                            </div>
+                            <div class="glass p-4 rounded-xl flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center">
+                                    <i class="fa-solid fa-droplet text-teal-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-400">Hydration</p>
+                                    <p class="font-bold text-lg">1,500 ml / 2,000 ml</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 z-10 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Everything You Need for <span class="text-blue-400">Better Health</span></h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg">My HealthMate combines essential tracking tools into one seamless, glossy interface designed to keep you motivated.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1: Steps -->
+                <div class="glass-panel glass-card rounded-2xl p-6 group cursor-default">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mb-6 shadow-lg transform group-hover:rotate-12 transition-transform">
+                        <i class="fa-solid fa-person-walking text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Step Tracking & Streaks</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Monitor your daily activity with dynamic progress rings. Set custom goals, view hourly distributions, and maintain weekly streaks to stay on top of your fitness game.
+                    </p>
+                </div>
+
+                <!-- Feature 2: Hydration -->
+                <div class="glass-panel glass-card rounded-2xl p-6 group cursor-default">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-6 shadow-lg transform group-hover:rotate-12 transition-transform">
+                        <i class="fa-solid fa-glass-water text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Hydration Monitoring</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Easily log water intake with quick action buttons. Set timely drink reminders to ensure you reach your daily hydration goals effortlessly.
+                    </p>
+                </div>
+
+                <!-- Feature 3: Medicine -->
+                <div class="glass-panel glass-card rounded-2xl p-6 group cursor-default">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center mb-6 shadow-lg transform group-hover:rotate-12 transition-transform">
+                        <i class="fa-solid fa-pills text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Medicine Reminders</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Never miss a prescription. Add medicines to your daily schedule and receive reliable, customizable alarms so your health regime is never compromised.
+                    </p>
+                </div>
+
+                <!-- Feature 4: Stopwatch -->
+                <div class="glass-panel glass-card rounded-2xl p-6 group cursor-default">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center mb-6 shadow-lg transform group-hover:rotate-12 transition-transform">
+                        <i class="fa-solid fa-stopwatch text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">High-Precision Stopwatch</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Built-in precision timer with 0.01s accuracy. Perfect for workouts, tracking rest periods, or recording lap splits right from your dashboard.
+                    </p>
+                </div>
+
+                <!-- Feature 5: Sleep -->
+                <div class="glass-panel glass-card rounded-2xl p-6 group cursor-default">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center mb-6 shadow-lg transform group-hover:rotate-12 transition-transform">
+                        <i class="fa-solid fa-moon text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Sleep Reminders</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Establish a healthy circadian rhythm. Receive gentle nudges when it's time to wind down, ensuring you get the rest your body needs to recover.
+                    </p>
+                </div>
+                
+                <!-- Feature 6: Dashboard -->
+                <div class="glass-panel glass-card rounded-2xl p-6 group cursor-default">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mb-6 shadow-lg transform group-hover:rotate-12 transition-transform">
+                        <i class="fa-solid fa-layer-group text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">All-In-One Hub</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Access Steps, Water, Stopwatch, and Sleep settings instantly via quick action buttons on a beautifully unified dashboard interface.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Gallery Section -->
+    <section id="gallery" class="py-20 z-10 relative glass border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">A Look Inside</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg">Experience a meticulously designed interface that puts your data front and center.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+
+                <!-- Image 1: Steps Streak -->
+                <div class="relative group w-full max-w-sm mt-8 sm:mt-0 lg:translate-y-12">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-teal-500 to-emerald-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                    <div class="relative glass-panel p-2 rounded-[2rem] h-full flex flex-col items-center">
+                        <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/steps.streak.png" alt="Dashboard View - Progress" class="rounded-[1.5rem] w-full h-auto object-cover shadow-2xl" onerror="this.src='https://placehold.co/400x800/1e293b/ffffff?text=Dashboard+Progress'">
+                    </div>
+                </div>
+
+                <!-- Image 2: Step Report -->
+                <div class="relative group w-full max-w-sm mt-8 lg:mt-0">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-orange-500 to-red-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                    <div class="relative glass-panel p-2 rounded-[2rem] h-full flex flex-col items-center">
+                        <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/step.report.png" alt="Activity Timeline & Streaks" class="rounded-[1.5rem] w-full h-auto object-cover shadow-2xl" onerror="this.src='https://placehold.co/400x800/1e293b/ffffff?text=Activity+Timeline'">
+                    </div>
+                </div>
+
+                <!-- Image 3: Hydration -->
+                <div class="relative group w-full max-w-sm mt-8">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                    <div class="relative glass-panel p-2 rounded-[2rem] h-full flex flex-col items-center">
+                        <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/Hydration.png" alt="Hydration Tracker" class="rounded-[1.5rem] w-full h-auto object-cover shadow-2xl" onerror="this.src='https://placehold.co/400x800/1e293b/ffffff?text=Hydration+Tracker'">
+                    </div>
+                </div>
+
+                <!-- Image 4: Hydration Achieve -->
+                <div class="relative group w-full max-w-sm mt-8 sm:mt-8 lg:translate-y-12">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-rose-500 to-pink-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                    <div class="relative glass-panel p-2 rounded-[2rem] h-full flex flex-col items-center">
+                        <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/Hydration-achieve.png" alt="Hydration Goal Achieved" class="rounded-[1.5rem] w-full h-auto object-cover shadow-2xl" onerror="this.src='https://placehold.co/400x800/1e293b/ffffff?text=Hydration+Achieved'">
+                    </div>
+                </div>
+
+                <!-- Image 5: Stopwatch -->
+                <div class="relative group w-full max-w-sm mt-8 lg:mt-8">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                    <div class="relative glass-panel p-2 rounded-[2rem] h-full flex flex-col items-center">
+                        <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/stop.watch.png" alt="High-Precision Stopwatch" class="rounded-[1.5rem] w-full h-auto object-cover shadow-2xl" onerror="this.src='https://placehold.co/400x800/1e293b/ffffff?text=Stopwatch'">
+                    </div>
+                </div>
+
+                <!-- Image 6: Medicine Reminders -->
+                <div class="relative group w-full max-w-sm mt-8">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                    <div class="relative glass-panel p-2 rounded-[2rem] h-full flex flex-col items-center">
+                        <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/medicine.png" alt="Medicine Reminders" class="rounded-[1.5rem] w-full h-auto object-cover shadow-2xl" onerror="this.src='https://placehold.co/400x800/1e293b/ffffff?text=Medicine+Reminders'">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section id="tech" class="py-16 z-10 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-purple-600 rounded-full blur-3xl opacity-20"></div>
+                <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600 rounded-full blur-3xl opacity-20"></div>
+                
+                <h2 class="text-2xl md:text-3xl font-bold mb-4 relative z-10">Built for Performance & Reliability</h2>
+                <p class="text-gray-300 mb-8 relative z-10 max-w-2xl mx-auto">
+                    My HealthMate is engineered to deliver a robust, seamless user experience without draining your device's resources.
+                </p>
+                
+                <div class="flex flex-wrap justify-center gap-4 md:gap-8 relative z-10">
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-2xl glass flex items-center justify-center">
+                            <i class="fa-brands fa-android text-3xl text-green-400"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-300">Android Native</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-2xl glass flex items-center justify-center">
+                            <span class="text-2xl font-bold text-purple-400 tracking-tighter">KT</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-300">Kotlin</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-2xl glass flex items-center justify-center">
+                            <i class="fa-solid fa-layer-group text-2xl text-blue-400"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-300">Jetpack Compose</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-2xl glass flex items-center justify-center">
+                            <i class="fa-solid fa-bolt text-2xl text-yellow-400"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-300">Optimized Build</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="glass mt-auto border-t border-white/10 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center text-center">
+            <div class="flex items-center gap-3 mb-4">
+                <img src="https://raw.githubusercontent.com/satya-git-ai/My-HealthMate/main/app/my_healthmate_logo_1024x1024.png" alt="My HealthMate Logo" class="w-8 h-8 rounded-lg shadow-sm object-cover">
+                <span class="font-bold text-lg text-white">My HealthMate</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">
+                &copy; 2026 My HealthMate App. All rights reserved. Your companion for daily wellness.
+            </p>
+            <div class="flex space-x-6 mb-6">
+                <a href="mailto:satyatruly@gmail.com" class="text-gray-400 hover:text-white transition-colors">Contact</a>
+            </div>
+            <p class="text-gray-500 text-xs tracking-wider uppercase font-semibold">
+                created & developed by satya
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple script to add background to navbar on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(15, 23, 42, 0.7)';
+                nav.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.03)';
+                nav.style.borderBottom = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
